@@ -56,6 +56,11 @@ names.  At least one target specifier is needed.
 Multiple values can be set for --machine, --application, and --unit by using
 comma separated values.
 
+Options are shorted in addition to existing spec for usabilty purpose.
+option --application can also be specified as --app, -a
+option --unit can also be specified as -u
+option --timeout can also be specified as -t
+
 If the target is a machine, the command is run as the "root" user on
 the remote machine.
 
@@ -101,10 +106,16 @@ func (c *runCommand) SetFlags(f *gnuflag.FlagSet) {
 		"default": cmd.FormatYaml,
 	})
 	f.BoolVar(&c.all, "all", false, "Run the commands on all the machines")
-	f.DurationVar(&c.timeout, "timeout", 5*time.Minute, "How long to wait before the remote command is considered to have failed")
+	for _, flag := range[]string{"timeout", "t"}  {
+		f.DurationVar(&c.timeout, flag, 5*time.Minute, "How long to wait before the remote command is considered to have failed")
+	}
 	f.Var(cmd.NewStringsValue(nil, &c.machines), "machine", "One or more machine ids")
-	f.Var(cmd.NewStringsValue(nil, &c.services), "application", "One or more application names")
-	f.Var(cmd.NewStringsValue(nil, &c.units), "unit", "One or more unit ids")
+	for _, flag := range[]string{"application", "app", "a"}  {
+		f.Var(cmd.NewStringsValue(nil, &c.services), flag, "One or more application names")
+	}
+	for _, flag := range[]string{"unit", "u"}  {
+		f.Var(cmd.NewStringsValue(nil, &c.units), flag, "One or more unit ids")
+	}
 }
 
 func (c *runCommand) Init(args []string) error {
